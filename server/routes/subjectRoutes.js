@@ -3,10 +3,10 @@ const router = express.Router();
 const authMiddleware = require('../middleware/auth');
 const LearningHubContent = require('../models/LearningHubContent');
 const UserSubjectProgress = require('../models/UserSubjectProgress');
-const { GoogleGenAI } = require('@google/genai');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 // Initialize Gemini API
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // Get content for a specific subject
 router.get('/:subject', authMiddleware, async (req, res) => {
@@ -53,15 +53,15 @@ router.post('/eval-vocal-response', authMiddleware, async (req, res) => {
       - encouragingFeedback (string): A short, friendly, supportive message (e.g., "Great job! You totally got it." or "That's a solid attempt! You're super close, try highlighting the concept of...").
     `;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: prompt,
-      config: {
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const response = await model.generateContent({
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      generationConfig: {
         responseMimeType: "application/json"
       }
     });
 
-    const result = JSON.parse(response.text);
+    const result = JSON.parse(response.response.text());
 
     // Update progress if they passed
     if (result.passing && itemId && subject) {

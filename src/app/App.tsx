@@ -23,6 +23,13 @@ import { AdminDashboard } from "../pages/AdminDashboard";
 import { AdminOverview } from "../pages/AdminOverview";
 import { AdminUsers } from "../pages/AdminUsers";
 import { AdminSettings } from "../pages/AdminSettings";
+import { Home } from "../pages/Home";
+import { Assignments } from "../pages/Assignments";
+import { TestCatalog } from "../pages/TestCatalog";
+import { Diy } from "../pages/Diy";
+import { DiyInterviews } from "../pages/DiyInterviews";
+import { AptitudeTest } from "../pages/AptitudeTest";
+import { Settings } from "../pages/Settings";
 
 export default function App() {
   return (
@@ -35,7 +42,14 @@ export default function App() {
             <Route path="/register" element={<Register />} />
             
             <Route element={<DashboardLayout />}>
+              <Route path="/home" element={<Home />} />
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/assignments" element={<Assignments />} />
+              <Route path="/test-catalog" element={<TestCatalog />} />
+              <Route path="/diy" element={<Diy />} />
+              <Route path="/diy/interviews" element={<DiyInterviews />} />
+              <Route path="/aptitude-test" element={<AptitudeTest />} />
+              <Route path="/settings" element={<Settings />} />
               <Route path="learning-hub" element={<LearningHub />} />
               <Route path="/learning-hub/:subject" element={<SubjectSubDashboard />} />
               <Route path="coding/:problemId" element={<CodingArena />} />

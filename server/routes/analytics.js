@@ -7,7 +7,7 @@ const UserSubjectProgress = require('../models/UserSubjectProgress');
 // GET /api/analytics
 router.get('/', authMiddleware, async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user;
 
     // 1. Fetch User Subject Progress for "Topics Mastered"
     // A topic is mastered if completedItems.length > 0 (or a specific threshold)

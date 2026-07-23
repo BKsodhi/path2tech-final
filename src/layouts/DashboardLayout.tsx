@@ -18,6 +18,11 @@ import {
   LogOut,
   Calendar,
   Trophy,
+  Home,
+  ClipboardList,
+  Library,
+  Wrench,
+  Brain,
 } from "lucide-react";
 import { useAppContext } from "../context/AppContext";
 
@@ -57,7 +62,14 @@ export function DashboardLayout() {
 
   // Helper to map route path to header title
   const getHeaderTitle = () => {
+    if (location.pathname.startsWith("/home")) return "Welcome to Path2Tech";
     if (location.pathname.startsWith("/dashboard")) return "Dashboard";
+    if (location.pathname.startsWith("/assignments")) return "Assignments";
+    if (location.pathname.startsWith("/test-catalog")) return "Test Catalog";
+    if (location.pathname.startsWith("/diy/interviews")) return "AI Interviews";
+    if (location.pathname.startsWith("/diy")) return "Do It Yourself";
+    if (location.pathname.startsWith("/aptitude-test")) return "Aptitude Test";
+    if (location.pathname.startsWith("/settings")) return "Settings";
     if (location.pathname.startsWith("/learning-hub")) return "Learning Hub";
     if (location.pathname.startsWith("/topic")) return "Topic Detail";
     if (location.pathname.startsWith("/coding")) return "Practice";
@@ -66,7 +78,7 @@ export function DashboardLayout() {
     if (location.pathname.startsWith("/interview")) return "AI Interview";
     if (location.pathname.startsWith("/analytics")) return "Analytics";
     if (location.pathname.startsWith("/leaderboard")) return "Leaderboard";
-    return "Dashboard";
+    return "Path2Tech";
   };
 
   return (
@@ -103,12 +115,16 @@ export function DashboardLayout() {
         <nav className="flex-1 px-3 py-3 space-y-0.5 overflow-y-auto">
           <div className="text-[10px] font-semibold text-slate-600 uppercase tracking-widest px-2 mb-2">Main Menu</div>
           <div className="space-y-1">
+            <NavItem icon={<Home size={16} />} label="Student Home" to="/home" />
             <NavItem icon={<LayoutDashboard size={16} />} label="Dashboard" to="/dashboard" />
+            <NavItem icon={<ClipboardList size={16} />} label="Assignments" to="/assignments" />
+            <NavItem icon={<Library size={16} />} label="Test Catalog" to="/test-catalog" />
+            <NavItem icon={<Brain size={16} />} label="Aptitude Test" to="/aptitude-test" />
+            <NavItem icon={<Wrench size={16} />} label="DIY" to="/diy" />
+            
+            {/* Legacy Links */}
             <NavItem icon={<BookOpen size={16} />} label="Learning Hub" to="/learning-hub" />
             <NavItem icon={<Target size={16} />} label="Assessments" to="/assessments" />
-            <NavItem icon={<FileText size={16} />} label="Resume Studio" to="/resume" />
-            <NavItem icon={<BrainCircuit size={16} />} label="AI Interview" to="/interview" />
-            <NavItem icon={<BarChart3 size={16} />} label="Analytics" to="/analytics" />
           </div>
 
           <div className="text-[10px] font-semibold text-slate-600 uppercase tracking-widest px-2 mt-4 mb-2">Resources</div>
@@ -117,6 +133,7 @@ export function DashboardLayout() {
             <NavItem icon={<Calendar size={16} />} label="Calendar" to="/calendar" />
             <NavItem icon={<Target size={16} />} label="Achievements" to="/achievements" />
             <NavItem icon={<Bell size={16} />} label="Notifications" to="/notifications" />
+            <NavItem icon={<Settings size={16} />} label="Settings" to="/settings" />
             {user?.role === 'admin' && (
               <NavItem icon={<Settings size={16} />} label="Admin Panel" to="/admin" />
             )}

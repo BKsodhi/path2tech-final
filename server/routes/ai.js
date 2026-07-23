@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const authMiddleware = require('../middleware/auth');
-const { GoogleGenAI } = require('@google/genai');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 const Notification = require('../models/Notification');
 
 // Initialize Gemini SDK safely
-let ai;
+let genAI;
 if (process.env.GEMINI_API_KEY) {
-  ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+  genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 } else {
   console.warn("GEMINI_API_KEY is not set. AI routes will return simulated responses.");
 }
@@ -17,7 +17,7 @@ router.post('/interview', authMiddleware, async (req, res) => {
   try {
     const { messages, topic, question } = req.body;
     
-    if (!ai) {
+    if (!genAI) {
       // Simulated response if API key is missing
       return res.json({ 
         role: "ai", 
@@ -36,18 +36,21 @@ The candidate is currently practicing the topic: ${topic || 'General SWE'}.
 If a specific question was provided ("${question || 'none'}"), ensure you evaluate their understanding of it.
 Keep your responses concise, conversational, and professional. Ask follow-up questions to test depth of knowledge.`;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-1.5-pro',
+    const model = genAI.getGenerativeModel({ 
+      model: 'gemini-1.5-flash',
+      systemInstruction: systemInstruction 
+    });
+
+    const result = await model.generateContent({
       contents: contents,
-      config: {
-        systemInstruction: systemInstruction,
+      generationConfig: {
         temperature: 0.7,
       }
     });
 
     res.json({
       role: 'ai',
-      text: response.text
+      text: result.response.text()
     });
 
   } catch (err) {
@@ -65,7 +68,7 @@ router.post('/resume', authMiddleware, async (req, res) => {
   try {
     const { resumeText } = req.body;
     
-    if (!ai) {
+    if (!genAI) {
       // Simulated response if API key is missing
       return res.json({ 
         atsScore: 87,
@@ -84,16 +87,17 @@ Return ONLY a raw JSON object with these exact keys: atsScore (number), keywords
 Resume Text:
 ${resumeText}`;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-1.5-pro',
-      contents: prompt,
-      config: {
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    
+    const result = await model.generateContent({
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      generationConfig: {
         temperature: 0.2,
       }
     });
 
     try {
-      const jsonStr = response.text.replace(/```json\n?|\n?```/g, '').trim();
+      const jsonStr = result.response.text().replace(/```json\n?|\n?```/g, '').trim();
       const result = JSON.parse(jsonStr);
       
       // Create a notification

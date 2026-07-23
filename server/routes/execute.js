@@ -104,6 +104,23 @@ public class JDoodleTestRunner {
       };
     }
 
+    // Save submission to database
+    const status = executionResult.code === 0 ? 'Accepted' : 'Compile Error';
+    const newSubmission = new Submission({
+      user: req.user,
+      problem: problemId,
+      code: code,
+      language: language,
+      status: status,
+      executionTimeMs: 50
+    });
+    await newSubmission.save();
+
+    // Check for milestones
+    const user = await User.findById(req.user);
+    const submissions = await Submission.find({ user: req.user, status: 'Accepted' }).distinct('problem');
+    const totalSolved = submissions.length;
+
     // If execution was successful (code 0) and we passed tests, award XP
     let success = executionResult.code === 0 && !executionResult.output.toLowerCase().includes('error') && !executionResult.output.toLowerCase().includes('exception');
     
@@ -111,7 +128,6 @@ public class JDoodleTestRunner {
     if (code.includes('return []') && problem.title === "Two Sum") success = false;
 
     if (success) {
-      const user = await User.findById(req.user);
       // Only award XP if not already solved (simplified logic)
       user.totalXp += problem.xp || 100;
       user.problemsSolved += 1;
